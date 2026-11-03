@@ -183,22 +183,12 @@ const TEACHER_SCHEDULE = {
   Kamis: { 2: 'c3' }, Jumat: { 0: 'c1', 1: 'c2' }
 };
 
-const QUIZ = {
-  sej: [
-    { q: 'Jenderal Belanda yang menerapkan taktik Benteng Stelsel adalah ...', o: ['J.P. Coen', 'H.W. Daendels', 'Jenderal De Kock', 'Van den Bosch'], a: 2 },
-    { q: 'Taktik Perang Gerilya yang merepotkan Belanda dipimpin oleh ...', o: ['Sultan Hasanuddin', 'Pangeran Diponegoro', 'Tuanku Imam Bonjol', 'Sultan Ageng Tirtayasa'], a: 1 },
-    { q: 'Tujuan utama diterapkannya Benteng Stelsel adalah ...', o: ['Melindungi warga sipil Belanda', 'Menghemat kas Belanda', 'Mempersempit ruang gerak gerilyawan', 'Membangun infrastruktur desa'], a: 2 }
-  ],
-  fis: [
-    { q: 'Hukum I Newton disebut juga hukum ...', o: ['Aksi-reaksi', 'Inersia', 'Gravitasi', 'Percepatan'], a: 1 },
-    { q: 'Rumus Hukum II Newton adalah ...', o: ['F = m × a', 'F = m / a', 'F = a / m', 'F = m + a'], a: 0 }
-  ],
-  kim: [
-    { q: 'Massa molar H₂O (Ar H = 1, O = 16) adalah ...', o: ['16', '18', '20', '32'], a: 1 },
-    { q: 'Jumlah partikel dalam 1 mol zat adalah ...', o: ['6,02 × 10²³', '3,01 × 10²³', '6,02 × 10²²', '1,66 × 10⁻²⁴'], a: 0 }
-  ]
-};
-
+const QUIZ_LINKS = [
+  { id: 1, title: 'Evaluasi manusia pada masa praaksara', duration: 60, due: isoOffset(2), url: 'https://docs.google.com/forms/d/e/1FAIpQLScwgSo4R1d4aNMZ4mO5OX0cYzCazgzzRQ_Rckv--m58nakvMw/viewform?usp=publish-editor' },
+  { id: 2, title: 'LATIHAN SOAL PERKEMBANGAN KERAJAAN HINDU BUDHA', duration: 45, due: isoOffset(4), url: 'https://docs.google.com/forms/d/e/1FAIpQLSeP7lsTIDZ3lCY9Y8F85B55ZA9W6kDP2CB0P16w351IfK2wHw/viewform?usp=publish-editor' },
+  { id: 3, title: 'LATIHAN SOAL KERAJAAN ISLAM', duration: 30, due: isoOffset(6), url: 'https://docs.google.com/forms/d/e/1FAIpQLSf50Vh_WcdjlB8g355afVd0-nskHnRM3MpVfftM051E3BxAGw/viewform?usp=publish-editor' },
+  { id: 4, title: 'LATIHAN SOAL PERANG PRA KEMERDEKAAN', duration: 45, due: isoOffset(8), url: 'https://docs.google.com/forms/d/e/1FAIpQLScASkBt4xuahqYe_Nhf1kTRXCIKOG0RsYHXEvF4cRxki8thAg/viewform?usp=publish-editor' }
+];
 /* ---------------------------- State -------------------------------- */
 const ACCENTS = { indigo: ['#6366f1', '#8b5cf6'], emerald: ['#10b981', '#06b6d4'], rose: ['#f43f5e', '#f97316'], vintage: ['#8b5a2b', '#5c3a21'], amber: ['#f59e0b', '#ef4444'] };
 const settings = Object.assign({ theme: 'light', accent: 'vintage', anim: true, font: 'md', emailNotif: true }, store.get('settings', {}));
@@ -315,7 +305,7 @@ function matCard(m, role) {
 /* ---------------------------- Menus -------------------------------- */
 const MENUS = {
   teacher: [['dashboard', 'Dashboard', 'bi-speedometer2'], ['kelas', 'Kelas Saya', 'bi-people'], ['materi', 'Materi', 'bi-journal-richtext'], ['tugas', 'Tugas & Ujian', 'bi-clipboard-check'], ['penilaian', 'Penilaian', 'bi-award'], ['jadwal', 'Jadwal Mengajar', 'bi-calendar-week'], ['profil', 'Profil Guru', 'bi-person-circle']],
-  student: [['dashboard', 'Dashboard', 'bi-speedometer2'], ['kelas', 'Kelas Saya', 'bi-collection'], ['materi', 'Materi', 'bi-journal-richtext'], ['peta', 'Peta Konsep', 'bi-diagram-3'], ['video', 'Video Edukasi', 'bi-play-btn'], ['diskusi', 'Ruang Diskusi', 'bi-chat-dots'], ['presensi', 'Presensi', 'bi-calendar-check'], ['tugas', 'Tugas', 'bi-clipboard-check'], ['ujian', 'Evaluasi (Kuis)', 'bi-patch-question'], ['nilai', 'Nilai', 'bi-bar-chart-line'], ['profil', 'Profil Siswa', 'bi-person-circle']]
+  student: [['dashboard', 'Dashboard', 'bi-speedometer2'], ['kelas', 'Kelas Saya', 'bi-collection'], ['materi', 'Materi', 'bi-journal-richtext'], ['peta', 'Peta Konsep', 'bi-diagram-3'], ['video', 'Video Edukasi', 'bi-play-btn'], ['diskusi', 'Ruang Diskusi', 'bi-chat-dots'], ['presensi', 'Presensi', 'bi-calendar-check'], ['tugas', 'Tugas', 'bi-clipboard-check'], ['ujian', 'Latihan Soal', 'bi-patch-question'], ['nilai', 'Nilai', 'bi-bar-chart-line'], ['profil', 'Profil Siswa', 'bi-person-circle']]
 };
 const COMMON = [['notifikasi', 'Notifikasi', 'bi-bell'], ['pengumuman', 'Pengumuman', 'bi-megaphone'], ['pengaturan', 'Pengaturan', 'bi-gear']];
 const unreadCount = () => NOTIFS[state.role].filter(n => !NREAD.has(n.id)).length;
@@ -730,15 +720,27 @@ PAGES.student.tugas = root => {
 };
 
 PAGES.student.ujian = root => {
-  const list = myTasks().filter(t => t.kind === 'Ujian').sort((a, b) => a.due.localeCompare(b.due));
-  root.innerHTML = head('Evaluasi (Kuis)', 'Daftar evaluasi sejarah. Klik "Mulai Evaluasi" untuk menguji analisis.') + `<div class="row g-3">${list.map(t => {
-    const s = subj(t.subject), r = EXAMS[t.id], d = dueInfo(t.due);
-    return `<div class="col-md-6 col-xl-4 reveal"><div class="card-x subj-card hover-lift h-100" style="--c:${s.color}"><i class="bi ${s.icon} big-ico"></i>
-      <div class="d-flex justify-content-between"><span class="badge-soft" style="--c:${s.color}">${s.name}</span>${r ? '<span class="badge-soft success">Selesai</span>' : `<span class="badge-soft ${d.c}">${d.t}</span>`}</div>
-      <h5 class="fw-bold mt-3">${esc(t.title)}</h5>
-      <div class="small text-muted mb-3"><i class="bi bi-calendar3"></i> ${fmtDate(t.due)} &nbsp; <i class="bi bi-clock"></i> ${t.duration} menit</div>
-      ${r ? `<div class="d-flex justify-content-between align-items-center"><span class="text-muted small">Skor kamu</span><span class="fs-3 fw-bold" style="color:${s.color}">${r.score}</span></div>` : `<button class="btn btn-accent w-100" data-act="startExam" data-id="${t.id}"><i class="bi bi-play-fill"></i> Mulai Evaluasi</button>`}</div></div>`;
-  }).join('')}</div>`;
+  root.innerHTML = head('Evaluasi (Kuis)', 'Daftar evaluasi sejarah. Klik kartu kuis untuk langsung mengisi formulir Google Form.') + 
+  `<div class="row g-3">
+    ${QUIZ_LINKS.map(item => {
+      const d = dueInfo(item.due);
+      return `
+        <div class="col-md-6 col-xl-3 reveal">
+          <div class="card-x subj-card hover-lift h-100" data-act="openGform" data-id="${item.id}" style="--c:#8b5a2b; cursor:pointer;">
+            <i class="bi bi-file-earmark-text big-ico"></i>
+            <div class="icon-bubble mb-3" style="--c:#8b5a2b"><i class="bi bi-file-earmark-text"></i></div>
+            <h5 class="fw-bold mb-1" style="font-family:'Playfair Display',serif;">${item.title}</h5>
+            <div class="small text-muted mb-3"><i class="bi bi-calendar3"></i> ${fmtDate(item.due)} &nbsp; <i class="bi bi-clock"></i> ${item.duration} menit</div>
+            <div class="d-flex justify-content-between align-items-center mt-auto">
+              <span class="badge-soft ${d.c}">${d.t}</span>
+              <button class="btn btn-sm btn-accent" data-act="openGform" data-id="${item.id}">
+                Buka <i class="bi bi-box-arrow-up-right ms-1"></i>
+              </button>
+            </div>
+          </div>
+        </div>`;
+    }).join('')}
+  </div>`;
 };
 
 PAGES.student.nilai = root => {
@@ -761,15 +763,27 @@ function profilePage(root) {
     <div class="col-lg-4 reveal"><div class="card-x text-center profile-card">${avatar(u.name, 80)}<h4 class="fw-bold mt-3 mb-4" style="font-family:'Playfair Display',serif;">${esc(u.name)}</h4><p class="text-muted mb-2">${isT ? 'Guru Sejarah (Guru Penggerak)' : 'Siswa ' + u.className}</p><span class="badge-soft primary">${isT ? 'NIP ' + u.id : 'NIS ' + u.id}</span>
       <div class="mini-stats">${stats.map(s => `<div><b>${s[0]}</b><span>${s[1]}</span></div>`).join('')}</div></div></div>
     <div class="col-lg-8 reveal">
-      ${isT ? `
+    ${isT ? `
       <div class="card-x mb-3">
         <h5 class="fw-bold border-bottom pb-2" style="font-family:'Playfair Display',serif;">Kutipan Inspiratif</h5>
         <blockquote class="text-muted fst-italic mt-2" style="border-left: 4px solid var(--accent); padding-left:15px;">"لا تحتقر من دونك فلكلّ شيئ مزيّة"</blockquote>
         
-        <!-- BAGIAN RPP: DIBUAT 2 KOLOM & HANYA TOMBOL LIHAT -->
-        <h6 class="fw-bold mt-4 mb-2" style="font-family:'Playfair Display',serif;"><i class="bi bi-file-earmark-text me-1"></i> Perangkat Pembelajaran</h6>
+<!-- BAGIAN PERANGKAT PEMBELAJARAN & CV GURU -->
+        <h6 class="fw-bold mt-4 mb-2" style="font-family:'Playfair Display',serif;"><i class="bi bi-file-earmark-person me-1"></i> Berkas & Perangkat Guru</h6>
         <div class="row g-2">
-          <!-- Kolom 1: RPP K13 -->
+          <!-- CV Guru -->
+          <div class="col-md-6">
+            <div class="list-row p-2 border rounded-3 d-flex align-items-center gap-2">
+              <div class="icon-bubble flex-shrink-0" style="width:36px; height:36px; font-size:1.1rem;"><i class="bi bi-person-badge text-success"></i></div>
+              <div class="flex-grow-1 min-w-0">
+                <div class="fw-bold text-truncate small">CV Guru</div>
+                <small class="text-muted d-block" style="font-size:0.75rem;">Curriculum Vitae</small>
+              </div>
+              <button class="btn btn-light-x btn-sm px-2 flex-shrink-0" data-act="viewRpp" data-doc="cv" title="Lihat CV"><i class="bi bi-eye"></i> Lihat</button>
+            </div>
+          </div>
+
+          <!-- RPP K13 -->
           <div class="col-md-6">
             <div class="list-row p-2 border rounded-3 d-flex align-items-center gap-2">
               <div class="icon-bubble flex-shrink-0" style="width:36px; height:36px; font-size:1.1rem;"><i class="bi bi-file-earmark-pdf text-danger"></i></div>
@@ -781,7 +795,7 @@ function profilePage(root) {
             </div>
           </div>
 
-          <!-- Kolom 2: Modul Kurikulum Merdeka -->
+          <!-- Modul Kurikulum Merdeka -->
           <div class="col-md-6">
             <div class="list-row p-2 border rounded-3 d-flex align-items-center gap-2">
               <div class="icon-bubble flex-shrink-0" style="width:36px; height:36px; font-size:1.1rem;"><i class="bi bi-file-earmark-richtext text-primary"></i></div>
@@ -793,7 +807,6 @@ function profilePage(root) {
             </div>
           </div>
         </div>
-      </div>
       ` : ''}
       <div class="card-x"><h5 class="fw-bold mb-3" style="font-family:'Playfair Display',serif;">Informasi Pribadi</h5><form id="profForm" class="row g-3">
       <div class="col-md-6"><label class="form-label small fw-semibold">Nama lengkap</label><input class="form-control" name="name" value="${esc(u.name)}" required></div>
@@ -845,31 +858,6 @@ PAGES.common.pengaturan = root => {
     <div class="col-lg-5 reveal"><div class="card-x"><h5 class="fw-bold">Akun</h5><p class="text-muted small">Masuk sebagai <b>${esc(state.user.name)}</b> (${state.role === 'teacher' ? 'Guru' : 'Siswa'}).</p>
       <div class="d-grid gap-2"><button class="btn btn-light-x py-2" data-act="resetDemo"><i class="bi bi-arrow-counterclockwise"></i> Reset data demo</button><button class="btn btn-danger py-2" data-act="logout"><i class="bi bi-box-arrow-right"></i> Keluar</button></div></div></div></div>`;
 };
-
-/* ---------------------------- Quiz --------------------------------- */
-const quiz = { task: null, qs: [], i: 0, ans: [], t: 0, timer: null, done: false };
-function drawQuiz() {
-  const q = quiz.qs[quiz.i], last = quiz.i === quiz.qs.length - 1;
-  $('#modalBody').innerHTML = `<div class="d-flex justify-content-between align-items-center mb-3"><span class="badge-soft primary">Soal ${quiz.i + 1} dari ${quiz.qs.length}</span><span class="timer-pill" id="qTimer"><i class="bi bi-stopwatch"></i> ${timeStr(quiz.t)}</span></div>
-    <div class="bar mb-4"><i style="width:${(quiz.i + 1) / quiz.qs.length * 100}%"></i></div>
-    <h5 class="fw-bold mb-3">${q.q}</h5>${q.o.map((o, i) => `<button class="opt ${quiz.ans[quiz.i] === i ? 'sel' : ''}" data-act="pick" data-i="${i}"><b>${'ABCD'[i]}</b>${o}</button>`).join('')}`;
-  $('#modalFooter').classList.remove('d-none');
-  $('#modalFooter').innerHTML = `<button class="btn btn-accent px-4" data-act="quizNext" ${quiz.ans[quiz.i] === undefined ? 'disabled' : ''}>${last ? 'Selesai' : 'Lanjut'} <i class="bi bi-arrow-right"></i></button>`;
-}
-const timeStr = s => `${pad(Math.floor(s / 60))}:${pad(s % 60)}`;
-function finishQuiz() {
-  clearInterval(quiz.timer);
-  quiz.done = true;
-  const ok = quiz.qs.filter((q, i) => quiz.ans[i] === q.a).length, score = Math.round(ok / quiz.qs.length * 100);
-  EXAMS[quiz.task.id] = { score, date: isoOffset(0) }; store.set('exams', EXAMS);
-  const s = subj(quiz.task.subject);
-  $('#modalTitle').innerHTML = 'Hasil Evaluasi';
-  $('#modalBody').innerHTML = `<div class="text-center py-3"><div class="ring" data-p="${score}"><span>${score}</span></div><h4 class="fw-bold mt-4" style="font-family:'Playfair Display',serif;">${score >= 80 ? 'Analisis Sejarah Tajam! 🎉' : score >= 60 ? 'Bagus, perdalam lagi! 💪' : 'Jangan menyerah, baca ulang arsip! 📚'}</h4><p class="text-muted">${ok} dari ${quiz.qs.length} jawaban benar · ${s.name}</p></div>`;
-  $('#modalFooter').innerHTML = `<button class="btn btn-accent px-4" data-bs-dismiss="modal">Tutup</button>`;
-  post($('#modalBody'));
-  if (score >= 80) confetti();
-}
-
 /* ---------------------------- Actions ------------------------------ */
 const ACTIONS = {
   go: d => go(d.page),
@@ -968,10 +956,24 @@ const ACTIONS = {
     toast('Presensi berhasil disimpan ke dalam arsip.', 'success');
   },
   viewRpp: d => {
-    const isK13 = d.doc === 'k13';
-    const title = isK13 ? 'RPP K13 - Sejarah Indonesia Kelas XI' : 'Modul Ajar Kurikulum Merdeka - Sejarah XI';
-    const pdfUrl = isK13 ? 'RPP_K13 (1).pdf' : 'RPP_KUR MERDEKA (1).pdf';
-    const fileName = isK13 ? 'RPP_K13_Sejarah_Kelas_XI.pdf' : 'Modul_Ajar_Kurikulum_Merdeka.pdf';
+    let title, pdfUrl, fileName, desc;
+    
+    if (d.doc === 'cv') {
+      title = 'Curriculum Vitae (CV) - Pak Kamal Aminullah, S.Pd.';
+      pdfUrl = 'cvkamal.pdf'; // Pastikan file PDF CV kamu disimpan dengan nama ini di folder proyek
+      fileName = 'CV_Kamal_Aminullah.pdf';
+      desc = 'Profil profesional, riwayat pendidikan, dan pengalaman mengajar Guru Sejarah.';
+    } else if (d.doc === 'k13') {
+      title = 'RPP K13 - Sejarah Indonesia Kelas XI';
+      pdfUrl = 'RPP_K13 (1).pdf';
+      fileName = 'RPP_K13_Sejarah_Kelas_XI.pdf';
+      desc = 'Perangkat pembelajaran resmi untuk pengajar Sejarah Kelas XI.';
+    } else {
+      title = 'Modul Ajar Kurikulum Merdeka - Sejarah XI';
+      pdfUrl = 'RPP_KUR MERDEKA (1).pdf';
+      fileName = 'Modul_Ajar_Kurikulum_Merdeka.pdf';
+      desc = 'Modul ajar Kurikulum Merdeka Sejarah Kelas XI.';
+    }
 
     openModal({
       title: `<span style="font-family:'Playfair Display',serif;">${esc(title)}</span>`,
@@ -979,17 +981,18 @@ const ACTIONS = {
       body: `
         <!-- Alert Banner Atas Lengkap Dengan Tombol Unduh -->
         <div class="d-flex justify-content-between align-items-center alert alert-warning small py-2 mb-3">
-          <span><i class="bi bi-file-earmark-pdf me-1"></i> Perangkat pembelajaran resmi untuk pengajar Sejarah Kelas XI.</span>
-          <a href="${pdfUrl}" download="${fileName}" class="btn btn-accent btn-sm rounded-pill px-3 flex-shrink-0" onclick="toast('Mengunduh dokumen RPP...')">
+          <span><i class="bi bi-file-earmark-pdf me-1"></i> ${desc}</span>
+          <a href="${pdfUrl}" download="${fileName}" class="btn btn-accent btn-sm rounded-pill px-3 flex-shrink-0" onclick="toast('Mengunduh dokumen PDF...')">
             <i class="bi bi-download me-1"></i> Unduh PDF
           </a>
         </div>
         
-        <!-- Pratinjau Document PDF -->
+        <!-- Pratinjau Dokumen PDF -->
         <div class="ratio ratio-16x9 rounded-3 overflow-hidden border shadow-sm">
           <iframe src="${pdfUrl}#toolbar=1&navpanes=0" style="border:0;" allowfullscreen></iframe>
         </div>
       `,
+      footer: `<button class="btn btn-light-x rounded-pill px-4" data-bs-dismiss="modal">Tutup</button>`
     });
   },
 
@@ -1089,16 +1092,18 @@ const ACTIONS = {
     SUBS[d.id] = { date: isoOffset(0), file: f ? f.name : 'catatan.txt', score: null }; store.set('subs', SUBS);
     closeModal(); confetti(); toast('Tugas berhasil dikumpulkan!'); ui.drawTasks && ui.drawTasks();
   },
-  startExam: d => {
-    const t = TASKS.find(x => x.id == d.id);
-    Object.assign(quiz, { task: t, qs: QUIZ[t.subject] || QUIZ.sej, i: 0, ans: [], t: 300, done: false });
-    openModal({ title: esc(t.title), body: '', footer: '', size: 'modal-lg' });
-    drawQuiz();
-    clearInterval(quiz.timer);
-    quiz.timer = setInterval(() => { quiz.t--; const el = $('#qTimer'); if (el) el.innerHTML = `<i class="bi bi-stopwatch"></i> ${timeStr(quiz.t)}`; if (quiz.t <= 0) finishQuiz(); }, 1000);
+  openGform: d => {
+    const item = QUIZ_LINKS.find(x => x.id == d.id);
+    if (item && item.url) {
+      window.open(item.url, '_blank');
+    }
   },
-  pick: d => { quiz.ans[quiz.i] = +d.i; drawQuiz(); },
-  quizNext: () => { if (quiz.i < quiz.qs.length - 1) { quiz.i++; drawQuiz(); } else finishQuiz(); }
+  startExam: d => {
+    const item = QUIZ_LINKS.find(x => x.id == d.id) || QUIZ_LINKS[0];
+    if (item && item.url) {
+      window.open(item.url, '_blank');
+    }
+  }
 };
 
 document.addEventListener('click', e => {
