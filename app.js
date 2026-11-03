@@ -771,6 +771,18 @@ function profilePage(root) {
 <!-- BAGIAN PERANGKAT PEMBELAJARAN & CV GURU -->
         <h6 class="fw-bold mt-4 mb-2" style="font-family:'Playfair Display',serif;"><i class="bi bi-file-earmark-person me-1"></i> Berkas & Perangkat Guru</h6>
         <div class="row g-2">
+          <!-- Kata Pengantar -->
+          <div class="col-md-6">
+            <div class="list-row p-2 border rounded-3 d-flex align-items-center gap-2">
+              <div class="icon-bubble flex-shrink-0" style="width:36px; height:36px; font-size:1.1rem;"><i class="bi bi-file-earmark-pdf text-danger"></i></div>
+              <div class="flex-grow-1 min-w-0">
+                <div class="fw-bold text-truncate small">Kata Pengantar</div>
+                <small class="text-muted d-block" style="font-size:0.75rem;">Kata Pengantar</small>
+              </div>
+              <button class="btn btn-light-x btn-sm px-2 flex-shrink-0" data-act="viewRpp" data-doc="pengantar" title="Lihat Kata Pengantar"><i class="bi bi-eye"></i> Lihat</button>
+            </div>
+          </div>
+
           <!-- CV Guru -->
           <div class="col-md-6">
             <div class="list-row p-2 border rounded-3 d-flex align-items-center gap-2">
@@ -958,10 +970,15 @@ const ACTIONS = {
   viewRpp: d => {
     let title, pdfUrl, fileName, desc;
     
-    if (d.doc === 'cv') {
+    if (d.doc === 'pengantar') {
+      title = 'Kata Pengantar';
+      pdfUrl = 'Kp.pdf'; // Nama file word/dokumen kamu
+      fileName = 'Kata Pengantar';
+      desc = 'Kata pengantar perangkat pembelajaran Sejarah Indonesia.';
+    } else if (d.doc === 'cv') {
       title = 'Curriculum Vitae (CV) - Pak Kamal Aminullah, S.Pd.';
-      pdfUrl = 'cvkamal.pdf'; // Pastikan file PDF CV kamu disimpan dengan nama ini di folder proyek
-      fileName = 'CV_Kamal_Aminullah.pdf';
+      pdfUrl = 'cvkamal.pdf';
+      fileName = 'cvkamal.pdf';
       desc = 'Profil profesional, riwayat pendidikan, dan pengalaman mengajar Guru Sejarah.';
     } else if (d.doc === 'k13') {
       title = 'RPP K13 - Sejarah Indonesia Kelas XI';
@@ -975,27 +992,36 @@ const ACTIONS = {
       desc = 'Modul ajar Kurikulum Merdeka Sejarah Kelas XI.';
     }
 
+    const isDocx = pdfUrl.endsWith('.docx');
+
     openModal({
       title: `<span style="font-family:'Playfair Display',serif;">${esc(title)}</span>`,
       size: 'modal-xl',
       body: `
         <!-- Alert Banner Atas Lengkap Dengan Tombol Unduh -->
         <div class="d-flex justify-content-between align-items-center alert alert-warning small py-2 mb-3">
-          <span><i class="bi bi-file-earmark-pdf me-1"></i> ${desc}</span>
-          <a href="${pdfUrl}" download="${fileName}" class="btn btn-accent btn-sm rounded-pill px-3 flex-shrink-0" onclick="toast('Mengunduh dokumen PDF...')">
-            <i class="bi bi-download me-1"></i> Unduh PDF
+          <span><i class="bi bi-${isDocx ? 'file-earmark-word' : 'file-earmark-pdf'} me-1"></i> ${desc}</span>
+          <a href="${pdfUrl}" download="${fileName}" class="btn btn-accent btn-sm rounded-pill px-3 flex-shrink-0" onclick="toast('Mengunduh dokumen...')">
+            <i class="bi bi-download me-1"></i> Unduh ${isDocx ? 'DOCX' : 'PDF'}
           </a>
         </div>
         
-        <!-- Pratinjau Dokumen PDF -->
+        <!-- Pratinjau Dokumen -->
         <div class="ratio ratio-16x9 rounded-3 overflow-hidden border shadow-sm">
-          <iframe src="${pdfUrl}#toolbar=1&navpanes=0" style="border:0;" allowfullscreen></iframe>
+          ${isDocx 
+            ? `<div class="d-flex flex-column align-items-center justify-content-center bg-light p-4 text-center">
+                <i class="bi bi-file-earmark-word text-primary" style="font-size: 4rem;"></i>
+                <h5 class="fw-bold mt-2">${esc(fileName)}</h5>
+                <p class="text-muted small">File Word (.docx) dapat langsung diunduh untuk dibaca secara utuh.</p>
+                <a href="${pdfUrl}" download="${fileName}" class="btn btn-primary rounded-pill px-4"><i class="bi bi-download me-1"></i> Unduh File Word</a>
+               </div>`
+            : `<iframe src="${pdfUrl}#toolbar=1&navpanes=0" style="border:0;" allowfullscreen></iframe>`
+          }
         </div>
       `,
       footer: `<button class="btn btn-light-x rounded-pill px-4" data-bs-dismiss="modal">Tutup</button>`
     });
   },
-
   /* siswa */
   goSubj: d => { ui.materiSubject = d.id; go('materi'); },
   openMat: d => {
