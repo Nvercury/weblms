@@ -972,7 +972,7 @@ const ACTIONS = {
     
     if (d.doc === 'pengantar') {
       title = 'Kata Pengantar';
-      pdfUrl = 'Kp.pdf'; // Nama file word/dokumen kamu
+      pdfUrl = 'pengantar.pdf';
       fileName = 'Kata Pengantar';
       desc = 'Kata pengantar perangkat pembelajaran Sejarah Indonesia.';
     } else if (d.doc === 'cv') {
