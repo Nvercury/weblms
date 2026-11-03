@@ -766,7 +766,7 @@ function profilePage(root) {
     ${isT ? `
       <div class="card-x mb-3">
         <h5 class="fw-bold border-bottom pb-2" style="font-family:'Playfair Display',serif;">Kutipan Inspiratif</h5>
-        <blockquote class="text-muted fst-italic mt-2" style="border-left: 4px solid var(--accent); padding-left:15px;">"لا تحتقر من دونك فلكلّ شيئ مزيّة"</blockquote>
+        <blockquote class="text-muted fst-italic mt-2" style="border-left: 4px solid var(--accent); padding-left:15px;">لا تحتقر من دونك فلكلّ شيئ مزيّة "janganlah kamu menghina seseorang yang lebih rendah darimu, karena segala sesuatu memiliki kelebihan."</blockquote>
         
 <!-- BAGIAN PERANGKAT PEMBELAJARAN & CV GURU -->
         <h6 class="fw-bold mt-4 mb-2" style="font-family:'Playfair Display',serif;"><i class="bi bi-file-earmark-person me-1"></i> Berkas & Perangkat Guru</h6>
