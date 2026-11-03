@@ -972,8 +972,8 @@ const ACTIONS = {
     
     if (d.doc === 'pengantar') {
       title = 'Kata Pengantar';
-      pdfUrl = 'pengantar.pdf';
-      fileName = 'Kata Pengantar';
+      pdfUrl = 'pengantar.pdf';  // Harus persis sama dengan nama file di folder!
+      fileName = 'pengantar.pdf';
       desc = 'Kata pengantar perangkat pembelajaran Sejarah Indonesia.';
     } else if (d.doc === 'cv') {
       title = 'Curriculum Vitae (CV) - Pak Kamal Aminullah, S.Pd.';
